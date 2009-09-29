@@ -1,3 +1,6 @@
-This is a library which parses Xbox Live Gamercard information from the HTML gamercard provided at live.xbox.com and makes it available for use in your own projects.
+This parser library, given a gamertag, will grab the HTML gamercard from live.xbox.com and extract the gamerscore and a few other salient details from it, returning a handy GamerCard object, which is just a data container for the gamercard information.
 
 There used to be a graphical forum signature generator included with this as an example; it has been moved to its own repository, PHP-Gamercard-Sig-Generator, which includes this as a subproject.
+
+Uses php5_dom_wrapper.php by Alexandre Alapetite for PHP 5 compatibility, 
+see http://alexandre.alapetite.fr/doc-alex/domxml-php4-php5/
