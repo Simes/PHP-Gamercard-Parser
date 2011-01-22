@@ -27,7 +27,7 @@ function error_handler($errno, $errstr)
 function getGamerCard($gamerTag)
 {
 	error_reporting(0);
-	$url = "http://gamercard.xbox.com/" . urlencode($gamerTag) . ".card";
+	$url = "http://gamercard.xbox.com/" . rawurlencode($gamerTag) . ".card";
 	// Grab the gamercard - the "body" tag and its contents are a valid xml doc 
 	// so we throw away the contents of the "head" tag. 
 	// We don't need them anyway.
