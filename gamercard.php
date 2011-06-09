@@ -24,17 +24,29 @@ function error_handler($errno, $errstr)
 {
 }
 
-function getGamerCard($gamerTag)
+function getGamerCard($gamerTag, $errors = 0)
 {
-	error_reporting(0);
+	error_reporting($errors);
 	$url = "http://gamercard.xbox.com/" . rawurlencode($gamerTag) . ".card";
 	// Grab the gamercard - the "body" tag and its contents are a valid xml doc 
 	// so we throw away the contents of the "head" tag. 
 	// We don't need them anyway.
 	
-	set_error_handler("error_handler");
+	if ($errors == 0 ) 
+	{
+		set_error_handler("error_handler");
+	}
+	else
+	{
+		print "Attempting to retrieve gamercard HTML from '$url'\n";
+	}
+	
 	$cardHTML = file_get_contents($url);
-	restore_error_handler();
+	if ($errors == 0)
+	{
+		restore_error_handler();
+	}
+	
 	if ($cardHTML == false)
 	{
 		return "";
@@ -63,7 +75,8 @@ function getGamerCard($gamerTag)
 	$card->tag = $gamerTag;
 
 // Membership type (Gold/Silver)
-
+// I have decided not to care about this for now.
+/*
 	$obj = $xpath->xpath_eval('//div[@class="Gamertag"]/a/span');
 	$nodeset = $obj->nodeset;
 	if (!$nodeset)
@@ -72,9 +85,9 @@ function getGamerCard($gamerTag)
 	}
 
 	$card->memberType = $nodeset[0]->get_attribute("class");
-
+*/
 // Gamer picture
-	$obj = $xpath->xpath_eval('//img[@class="GamerPic"]');
+	$obj = $xpath->xpath_eval('//img[@id="Gamerpic"]');
 	$nodeset = $obj->nodeset;
 
 
@@ -82,8 +95,8 @@ function getGamerCard($gamerTag)
 
 // Gamerscore
 
-	$obj = $xpath->xpath_eval('//div[preceding-sibling::div[@class="GSIcon"]]');
-	$nodeset = $obj->nodeset;
+	$obj = $xpath->xpath_eval('//div[@id="Gamerscore"]');
+	$nodeset = $obj->nodeset; 
 	$card->score = $nodeset[0]->get_content();
 
 // Rep
@@ -99,7 +112,7 @@ function getGamerCard($gamerTag)
 
 // Recently Played
 
-	$obj = $xpath->xpath_eval('//div[@class="Footer"]//img');
+	$obj = $xpath->xpath_eval('//ol[@id="PlayedGames"]//img');
 	$nodeset = $obj->nodeset;
 	
 	foreach($nodeset as $node)
@@ -111,4 +124,16 @@ function getGamerCard($gamerTag)
 	return $card;
 }
 
+if (defined("STDIN"))
+{
+	// Running from command line - get gamertag from arguments and dump data
+	
+	$tag = $argv[1];
+	$card = getGamerCard($tag, E_ALL);
+	
+	print "Gamertag: $card->tag \n";
+	print "Gamerscore: $card->score \n";
+	var_dump($card->recentlyPlayed);
+	
+}
 ?>
